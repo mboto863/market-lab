@@ -9,3 +9,14 @@ CREATE TABLE market.securities (
     sector TEXT,
     cik TEXT UNIQUE
 );
+
+CREATE TABLE market.price_history (
+    security_id INT NOT NULL REFERENCES market.securities(security_id),
+    trade_date DATE NOT NULL,
+    open NUMERIC(18,6),
+    high NUMERIC(18,6),
+    low NUMERIC(18,6),
+    close NUMERIC(18,6),
+    volume BIGINT,
+    PRIMARY KEY (security_id, trade_date)
+)

@@ -39,4 +39,16 @@ CREATE TABLE finance.company_financials (
     UNIQUE (security_id, period_end, fiscal_period, source_filing)
 );
 
+CREATE TABLE economy.macro_series (
+    series_id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    units TEXT,
+    frequency TEXT,
+);
 
+CREATE TABLE economy.macro_observations (
+    series_id TEXT NOT NULL REFERENCES finance.macro_series(series_id),
+    observation_date DATE NOT NULL,
+    value NUMERIC(25,8),
+    PRIMARY KEY (series_id, observation_date)
+);

@@ -1,6 +1,8 @@
 \c market-lab
 
 CREATE SCHEMA IF NOT EXISTS market;
+CREATE SCHEMA IF NOT EXISTS finance;
+CREATE SCHEMA IF NOT EXISTS economy;
 
 CREATE TABLE market.securities (
     security_id SERIAL PRIMARY KEY,
@@ -19,4 +21,22 @@ CREATE TABLE market.price_history (
     close NUMERIC(18,6),
     volume BIGINT,
     PRIMARY KEY (security_id, trade_date)
-)
+);
+
+CREATE TABLE finance.company_financials (
+    financil_id BIGSERIAL PRIMARY KEY,
+    security_id INT NOT NULL REFERENCES finance.securities(security_id),
+    period_end DATE NOT NULL,
+    fiscal_year INT NOT NULL,
+    fiscal_period TEXT NOT NULL,
+    revenue NUMERIC(20,2),
+    net_income NUMERIC(20,2),
+    total_assets NUMERIC(20,2),
+    total_liabilities NUMERIC(20,2),
+    operating_cash_flow NUMERIC(20,2),
+    source_filing TEXT,
+    loaded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (security_id, period_end, fiscal_period, source_filing)
+);
+
+

@@ -52,3 +52,37 @@ CREATE TABLE economy.macro_observations (
     value NUMERIC(25,8),
     PRIMARY KEY (series_id, observation_date)
 );
+
+-- Least-privilege grants
+GRANT USAGE ON SCHEMA market TO app_owner, reporting;
+GRANT USAGE ON SCHEMA finance TO app_owner, reporting;
+GRANT USAGE ON SCHEMA economy TO app_owner, reporting;
+
+-- Applies to tables that already exist when this script runs.
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA market TO app_owner; 
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA finance TO app_owner; 
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA economy TO app_owner; 
+GRANT SELECT ON ALL TABLES IN SCHEMA market TO reporting;
+GRANT SELECT ON ALL TABLES IN SCHEMA finance TO reporting;
+GRANT SELECT ON ALL TABLES IN SCHEMA economy TO reporting;
+
+-- Table privileges do not automatically include privileges on sequences backing them.
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA market TO app_owner;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA finance TO app_owner;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA economy TO app_owner;
+
+-- Applies only to future tables created by the app_owner group;
+ALTER DEFAULT PRIVILEGES IN SCHEMA market
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_owner;
+ALTER DEFAULT PRIVILEGES IN SCHEMA finance
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_owner;
+ALTER DEFAULT PRIVILEGES IN SCHEMA economy
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_owner;
+
+-- Applies only to future tables created by the reporting group;
+ALTER DEFAULT PRIVILEGES ON SCHEMA market
+GRANT SELECT ON TABLES TO reporting;
+ALTER DEFAULT PRIVILEGES ON SCHEMA finance
+GRANT SELECT ON TABLES TO reporting;
+ALTER DEFAULT PRIVILEGES ON SCHEMA economy
+GRANT SELECT ON TABLES TO reporting;

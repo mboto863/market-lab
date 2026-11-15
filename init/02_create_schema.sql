@@ -24,7 +24,7 @@ CREATE TABLE market.price_history (
 );
 
 CREATE TABLE finance.company_financials (
-    financil_id BIGSERIAL PRIMARY KEY,
+    financial_id BIGSERIAL PRIMARY KEY,
     security_id INT NOT NULL REFERENCES market.securities(security_id),
     period_end DATE NOT NULL,
     fiscal_year INT NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE economy.macro_series (
     series_id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     units TEXT,
-    frequency TEXT,
+    frequency TEXT
 );
 
 CREATE TABLE economy.macro_observations (

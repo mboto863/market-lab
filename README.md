@@ -10,5 +10,5 @@ psql "postgresql://postgres@localhost:5432/market-lab"
 
 Connect as the analyst
 ```
-psql "postgresql://analyst_user@localhost:5432/practice"
+psql "postgresql://analyst_user@localhost:5432/market-lab"
 ```

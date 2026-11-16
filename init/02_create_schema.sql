@@ -86,3 +86,43 @@ ALTER DEFAULT PRIVILEGES ON SCHEMA finance
 GRANT SELECT ON TABLES TO reporting;
 ALTER DEFAULT PRIVILEGES ON SCHEMA economy
 GRANT SELECT ON TABLES TO reporting;
+
+-- Ingestion metadata
+CREATE SCHEMA IF NOT EXISTS ingestion;
+
+CREATE TABLE ingestion.source (
+    source_id SERIAL PRIMARY KEY,
+    source_name TEXT UNIQUE NOT NULL,
+    description TEXT,
+    base_url TEXT,
+    documentation_url TEXT
+);
+
+CREATE TABLE ingestion.pipeline (
+    pipeline_id SERIAL PRIMARY KEY,
+    source_id INT NOT NULL REFERENCES ingestion.source(source_id),
+    pipeline_name TEXT NOT NULL,
+    target_schema TEXT NOT NULL,
+    target_table TEXT NOT NULL,
+    load_strategy TEXT NOT NULL,
+    unique_key TEXT NOT NULL, -- Merge keys.
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    UNIQUE (source_id, pipeline_name)
+);
+
+CREATE TABLE ingestion.runtime (
+    run_id BIGSERIAL PRIMARY KEY,
+    pipeline_id INT NOT NULL REFERENCES ingestion.pipeline(pipeline_id),
+    started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    finished_at TIMESTAMPTZ,
+    status TEXT NOT NULL,
+    rows_head BIGINT,
+    rows_accepted BIGINT,
+    rows_rejected BIGINT,
+    rows_inserted BIGINT,
+    rows_updated BIGINT,
+    error_message TEXT,
+    pipeline_version TEXT,
+    triggered_by TEXT
+);
+

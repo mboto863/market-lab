@@ -24,3 +24,23 @@ def download_stooq_csv(ticker: str) -> Path:
     path = RAW_DIR / f"{ticker.lower()}_daily.csv"
     df.to_csv(path, index=False)
     return path
+
+def normalize(df: pd.DataFrame, ticker: str) -> pd.DataFrame:
+    df = df.rename(
+        columns={
+            "Date": "trade_date",
+            "Open": "open",
+            "High": "high",
+            "Low": "low",
+            "Close": "close",
+            "Volume": "volume"
+        }
+    )
+
+    df["ticker"] = ticker.upper()
+    df["trade_date"] = pd.to_datetime(df["trade_date"]).dt.date
+
+    numeric_columns = ["open", "high", "low", "close", "volume"]
+    df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric, errors="coerce")
+
+    return df[["ticker", "trade_date", "open", "high", "low", "close", "volume"]]

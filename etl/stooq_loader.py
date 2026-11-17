@@ -44,3 +44,24 @@ def normalize(df: pd.DataFrame, ticker: str) -> pd.DataFrame:
     df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric, errors="coerce")
 
     return df[["ticker", "trade_date", "open", "high", "low", "close", "volume"]]
+
+def validate(df: pd.DataFrame, ticker: str) -> None:
+    if df.empty:
+        raise ValueError(f"No rows returned for {ticker}")
+
+    if df["trade_date"].duplicated().any():
+        raise ValueError(f"Duplicate trade dates found for {ticker}")
+
+    bad_ohlc = (
+        (df["high"] < df["low"])
+        | (df["high"] < df["open"])
+        | (df["high"] < df["close"])
+        | (df["low"] > df["open"])
+        | (df["low"] > df["close"])
+    )
+
+    if bad_ohlc.any():
+        raise ValueError(f"OHLC consistency errors found for {ticker}")
+
+    if (df[["open", "high", "low", "close"]] < 0).any().any():
+        raise ValueError(f"Negative prices found for {ticker}")

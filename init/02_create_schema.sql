@@ -80,11 +80,11 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA economy
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_owner;
 
 -- Applies only to future tables created by the reporting group;
-ALTER DEFAULT PRIVILEGES ON SCHEMA market
+ALTER DEFAULT PRIVILEGES IN SCHEMA market
 GRANT SELECT ON TABLES TO reporting;
-ALTER DEFAULT PRIVILEGES ON SCHEMA finance
+ALTER DEFAULT PRIVILEGES IN SCHEMA finance
 GRANT SELECT ON TABLES TO reporting;
-ALTER DEFAULT PRIVILEGES ON SCHEMA economy
+ALTER DEFAULT PRIVILEGES IN SCHEMA economy
 GRANT SELECT ON TABLES TO reporting;
 
 -- Ingestion metadata
@@ -131,8 +131,8 @@ ADD COLUMN IF NOT EXISTS ingestion_run_id BIGINT REFERENCES ingestion.runtime(ru
 
 -- Ingestion metadata writable only by the ETL role. Analysts should be able to
 -- inspect pipeline health, but not alter the audit trail.
-GRANT USAGE ON SCHEMA ingestion to app_owner, reporting;
+GRANT USAGE ON SCHEMA ingestion TO app_owner, reporting;
 GRANT SELECT ON ALL TABLES IN SCHEMA ingestion TO reporting;
 
 GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA ingestion TO app_owner;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ingestion TO app_onwer;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ingestion TO app_owner;

@@ -128,3 +128,11 @@ CREATE TABLE ingestion.runtime (
 
 ALTER TABLE market.price_history
 ADD COLUMN IF NOT EXISTS ingestion_run_id BIGINT REFERENCES ingestion.runtime(run_id);
+
+-- Ingestion metadata writable only by the ETL role. Analysts should be able to
+-- inspect pipeline health, but not alter the audit trail.
+GRANT USAGE ON SCHEMA ingestion to app_owner, reporting;
+GRANT SELECT ON ALL TABLES IN SCHEMA ingestion TO reporting;
+
+GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA ingestion TO app_owner;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ingestion TO app_onwer;

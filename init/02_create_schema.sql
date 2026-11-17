@@ -126,3 +126,5 @@ CREATE TABLE ingestion.runtime (
     triggered_by TEXT
 );
 
+ALTER TABLE market.price_history
+ADD COLUMN IF NOT EXISTS ingestion_run_id BIGINT REFERENCES ingestion.runtime(run_id);

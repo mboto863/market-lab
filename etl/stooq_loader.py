@@ -65,3 +65,71 @@ def validate(df: pd.DataFrame, ticker: str) -> None:
 
     if (df[["open", "high", "low", "close"]] < 0).any().any():
         raise ValueError(f"Negative prices found for {ticker}")
+
+def load_to_postgres(df: pd.DataFrame, conn_info: str) -> int:
+    buffer = StringIO()
+    df.to_csv(buffer, index=False, header=False)
+    buffer.seek(0)
+
+    with psycopg.connect(conn_info) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO market.security (ticker, company_name)
+                VALUES (%s, %s)
+                ON CONFLICT (ticker) DO NOTHING
+                """,
+                (df["ticker"].iloc[0], df["ticker"].iloc[0]),
+            )
+
+            cur.execute(
+                """
+                CREATE TEMP TABLE stg_price_history (
+                    ticker TEXT,
+                    trade_date DATE,
+                    open NUMERIC,
+                    low NUMERIC,
+                    close NUMERIC,
+                    volume BIGINT
+                )
+                """
+            )
+
+            cur.copy(
+                buffer,
+                """
+                COPY stg_price_history
+                FROM STDIN
+                WITH (FORMAT csv)
+                """
+            )
+
+            cur.execute(
+                """
+                    INSERT INTO market.historical_price (
+                        security_id, trade_date, open, high, low, close, volume, data_source
+                    )
+                    SELECT
+                        s.security_id,
+                        t.trade_date,
+                        t.open,
+                        t.high,
+                        t.low,
+                        t.close,
+                        t.volume,
+                        'stooq'
+                    FROM stg_price_history t
+                    JOIN market.security s on s.ticker = t.ticker
+                    ON CONFLICT (security_id, trade_date)
+                    DO UPDATE SET
+                        open = EXCLUDED.open,
+                        high = EXCLUDED.high,
+                        low = EXCLUDED.low,
+                        close = EXCLUDED.close,
+                        volume = EXCLUDED.volume,
+                        data_source = EXCLUDED.data_source
+                """
+            )
+
+            conn.commit()
+            return cur.rowcount

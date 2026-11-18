@@ -13,7 +13,7 @@ CREATE TABLE market.security (
 );
 
 CREATE TABLE market.historical_price (
-    security_id INT NOT NULL REFERENCES market.securities(security_id),
+    security_id INT NOT NULL REFERENCES market.security(security_id),
     trade_date DATE NOT NULL,
     open NUMERIC(18,6),
     high NUMERIC(18,6),
@@ -25,7 +25,7 @@ CREATE TABLE market.historical_price (
 
 CREATE TABLE finance.company_financials (
     financial_id BIGSERIAL PRIMARY KEY,
-    security_id INT NOT NULL REFERENCES market.securities(security_id),
+    security_id INT NOT NULL REFERENCES market.security(security_id),
     period_end DATE NOT NULL,
     fiscal_year INT NOT NULL,
     fiscal_period TEXT NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE ingestion.runtime (
     triggered_by TEXT
 );
 
-ALTER TABLE market.price_history
+ALTER TABLE market.historical_price
 ADD COLUMN IF NOT EXISTS ingestion_run_id BIGINT REFERENCES ingestion.runtime(run_id);
 
 -- Ingestion metadata writable only by the ETL role. Analysts should be able to

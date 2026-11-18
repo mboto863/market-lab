@@ -133,3 +133,17 @@ def load_to_postgres(df: pd.DataFrame, conn_info: str) -> int:
 
             conn.commit()
             return cur.rowcount
+
+if __name__ == "__main__":
+    conn_info = os.environ["DATABASE_URL"]
+
+    for ticker in TICKERS:
+        try:
+            csv_path = download_stooq_csv(ticker)
+            raw = pd.read_csv(csv_path)
+            clean = normalize(raw, ticker)
+            validate(clean, ticker)
+            rows = load_to_postgres(clean, conn_info)
+            print(f"{ticker}: loaded {rows} rows")
+        except Exception as exc:
+            print(f"{ticker}: FAILED - {exc}")

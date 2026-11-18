@@ -4,7 +4,7 @@ CREATE SCHEMA IF NOT EXISTS market;
 CREATE SCHEMA IF NOT EXISTS finance;
 CREATE SCHEMA IF NOT EXISTS economy;
 
-CREATE TABLE market.securities (
+CREATE TABLE market.security (
     security_id SERIAL PRIMARY KEY,
     ticker TEXT UNIQUE NOT NULL,
     company_name TEXT NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE market.securities (
     cik TEXT UNIQUE
 );
 
-CREATE TABLE market.price_history (
+CREATE TABLE market.historical_price (
     security_id INT NOT NULL REFERENCES market.securities(security_id),
     trade_date DATE NOT NULL,
     open NUMERIC(18,6),
@@ -46,7 +46,7 @@ CREATE TABLE economy.macro_series (
     frequency TEXT
 );
 
-CREATE TABLE economy.macro_observations (
+CREATE TABLE economy.macro_observation (
     series_id TEXT NOT NULL REFERENCES economy.macro_series(series_id),
     observation_date DATE NOT NULL,
     value NUMERIC(25,8),

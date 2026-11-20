@@ -1,2 +1,4 @@
 .env
 .venv
+# Downloaded source data.
+data/
